@@ -2,6 +2,7 @@ package com.example.todoff.data
 
 import androidx.room.*
 import com.example.todoff.data.TaskItem
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -18,4 +19,10 @@ fun getdata () : List<TaskItem>
 
 @Query("Delete from task_database")
 fun deleteall()
+
+
+@Query("Select * From task_database Where title Like '%' || :search || '%'")
+fun search(search : String) : List<TaskItem>
+
+
 }

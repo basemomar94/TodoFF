@@ -10,17 +10,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoff.R
+import androidx.appcompat.widget.SearchView;
+
 import com.example.todoff.adapter.TasksAdpater
 import com.example.todoff.data.DatabaseTasks
 import com.example.todoff.data.TaskItem
 import com.example.todoff.databinding.TasksFragmentBinding
 
-class TasksFragment() : Fragment(R.layout.tasks_fragment) {
+class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTextListener {
     lateinit var adpater: TasksAdpater
     var _binding: TasksFragmentBinding? = null
     val binding get() = _binding!!
     var taskList: List<TaskItem>? = null
-    lateinit var mlist: List<TaskItem>
+    var query: String? = null
+    var tempList: ArrayList<TaskItem>? = null
+    lateinit var mlist: ArrayList<TaskItem>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -29,6 +33,10 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment) {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_icons, menu)
+        val search = menu.findItem(R.id.search)
+        val searchView = search.actionView as SearchView
+        //searchView.isSubmitButtonEnabled=true
+        searchView.setOnQueryTextListener(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -40,6 +48,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment) {
 
 
             }
+
             else -> {
                 println("hi")
                 return true
@@ -59,9 +68,20 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.floatingActionButton2.setOnClickListener {
+            println("float")
+            searchData("b")
             val action = TasksFragmentDirections.actionTasksFragmentToAddFragment()
             findNavController().navigate(action)
-            println("Go!!")
+
+            binding.test.setOnClickListener {
+                println("button")
+
+                searchData("ggg")
+
+
+            }
+
+
         }
 
         getData()
@@ -81,7 +101,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment) {
     fun getData() {
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().getdata()
+            mlist = db.daoitems().getdata() as ArrayList<TaskItem>
+            taskList = mlist
 
             activity?.runOnUiThread {
                 recycleSetup(mlist)
@@ -92,7 +113,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment) {
 
     }
 
-    fun recycleSetup(list: List<TaskItem>) {
+    fun recycleSetup(list: ArrayList<TaskItem>) {
         binding.taskRecycle.layoutManager = LinearLayoutManager(context)
         binding.taskRecycle.adapter = TasksAdpater(list)
 
@@ -102,7 +123,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment) {
         val builder = AlertDialog.Builder(context)
         builder.setMessage("Are you sure you want to delete all the items permanently")
             .setCancelable(true)
-            .setPositiveButton("Yes") { dialog, id->
+            .setPositiveButton("Yes") { dialog, id ->
                 val db = DatabaseTasks.getInstance(context)
                 DatabaseTasks.db_write.execute {
                     db.daoitems().deleteall()
@@ -112,10 +133,66 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment) {
                     }
                 }
             }
-            .setNegativeButton("Cancel"){dialog,id -> dialog.dismiss() }
+            .setNegativeButton("Cancel") { dialog, id -> dialog.dismiss() }
         val alert = builder.create()
         alert.show()
 
+
+    }
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+
+
+        TODO("Not yet implemented")
+    }
+
+    override fun onQueryTextChange(newText: String): Boolean {
+
+        searchData(newText)
+        return false
+
+        TODO("Not yet implemented")
+    }
+
+
+    fun searchData(query: String) {
+        tempList?.clear()
+
+
+        val db = DatabaseTasks.getInstance(context)
+        DatabaseTasks.db_write.execute {
+            mlist = db.daoitems().search(query) as ArrayList<TaskItem>
+            println(mlist!!.size)
+
+            activity?.runOnUiThread {
+
+                recycleSetup(mlist)
+                println(mlist)
+
+            }
+
+          /*  activity?.runOnUiThread {
+
+                mlist!!.forEach {
+
+                    if (it.title!!.contains(query)) {
+
+                        tempList?.add(it)
+                        recycleSetup(tempList!!)
+
+
+                    }
+
+                }
+
+                // recycleSetup(mlist!!)
+
+            }*/
+        }
+
+    }
+
+    fun searchTest(query: String) {
 
     }
 

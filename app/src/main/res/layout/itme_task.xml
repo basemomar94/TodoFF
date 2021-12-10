@@ -20,7 +20,7 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:layout_weight="20"
-            app:srcCompat="@drawable/ic_baseline_priority_high_24" />
+            app:srcCompat="@drawable/important" />
 
         <TextView
             android:id="@+id/taskTV"
