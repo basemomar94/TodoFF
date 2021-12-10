@@ -73,13 +73,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
             val action = TasksFragmentDirections.actionTasksFragmentToAddFragment()
             findNavController().navigate(action)
 
-            binding.test.setOnClickListener {
-                println("button")
 
-                searchData("ggg")
-
-
-            }
 
 
         }
@@ -171,28 +165,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
             }
 
-          /*  activity?.runOnUiThread {
 
-                mlist!!.forEach {
-
-                    if (it.title!!.contains(query)) {
-
-                        tempList?.add(it)
-                        recycleSetup(tempList!!)
-
-
-                    }
-
-                }
-
-                // recycleSetup(mlist!!)
-
-            }*/
         }
-
-    }
-
-    fun searchTest(query: String) {
 
     }
 

@@ -1,9 +1,14 @@
 package com.example.todoff.ui
 
+import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -31,15 +36,19 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.itemET.requestFocus()
+        binding.itemET.showSoftInputOnFocus
+        binding.itemET.showKeyboard()
+
+
+
+
+
+        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
         binding.floatingActionButton.setOnClickListener {
             addtoDatabase()
         }
-
-
-
-
-
-
 
 
     }
@@ -59,23 +68,24 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
                 db.daoitems().insert_update(model)
                 binding.itemET.text.clear()
                 activity?.runOnUiThread {
-                    Toast.makeText(context,"item has been added",Toast.LENGTH_LONG).show()
-                    val action= AddFragmentDirections.actionAddFragmentToTasksFragment()
+                    Toast.makeText(context, "item has been added", Toast.LENGTH_LONG).show()
+                    val action = AddFragmentDirections.actionAddFragmentToTasksFragment()
                     findNavController().navigate(action)
                 }
-
-
-
-
 
 
             }
 
         } else {
 
-            Toast.makeText(context,"Enter an item",Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Enter an item", Toast.LENGTH_LONG).show()
 
         }
+    }
+
+    private fun View.showKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
 
