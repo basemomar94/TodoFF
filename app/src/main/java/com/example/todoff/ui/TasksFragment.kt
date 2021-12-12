@@ -2,6 +2,7 @@ package com.example.todoff.ui
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -15,13 +16,18 @@ import com.example.todoff.adapter.TasksAdpater
 import com.example.todoff.data.DatabaseTasks
 import com.example.todoff.data.TaskItem
 import com.example.todoff.databinding.TasksFragmentBinding
+import com.google.android.material.snackbar.Snackbar
 
-class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTextListener {
+class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTextListener,
+    View.OnClickListener {
     lateinit var adpater: TasksAdpater
     var _binding: TasksFragmentBinding? = null
     val binding get() = _binding!!
-    var taskList: List<TaskItem>? = null
+    var taskList: ArrayList<TaskItem>? = null
     var query: String? = null
+    var position: Int? = null
+    var realDelete: Boolean = true
+    var tasksAdpater: TasksAdpater? = null
     var tempList: ArrayList<TaskItem>? = null
     lateinit var mlist: ArrayList<TaskItem>
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +52,11 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
             }
             R.id.order -> {
                 showOrderMenue()
-                deleteOneItem(1)
+
                 when (item.itemId) {
                     R.id.nameUp -> ordernameD()
 
-                    R.id.namdeD->ordernameUp()
+                    R.id.namdeD -> ordernameUp()
 
                 }
 
@@ -58,7 +64,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
             }
             R.id.nameUp -> {
                 ordernameD()
-                return  true
+                return true
             }
             else -> {
                 println("hi")
@@ -87,25 +93,33 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         }
         getData()
 
-       val itemTouchHelperCallback= object : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT){
-           override fun onMove(
-               recyclerView: RecyclerView,
-               viewHolder: RecyclerView.ViewHolder,
-               target: RecyclerView.ViewHolder
-           ): Boolean {
-               return false
+        val itemTouchHelperCallback =
+            object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
 
-           }
+                }
 
-           override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-               deleteOneItem(viewHolder.adapterPosition)
+                    position = viewHolder.absoluteAdapterPosition
+
+                    fakeDelete(viewHolder.absoluteAdapterPosition)
+                    Handler().postDelayed({
+                        println("realDelete $realDelete")
+                        if (realDelete) {
+                            deleteOneItem(position!!)
+                        }
+
+                    }, 4000)
 
 
-
-
-           }
-       }
+                }
+            }
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(binding.taskRecycle)
 
@@ -121,10 +135,12 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
             mlist = db.daoitems().getdata() as ArrayList<TaskItem>
+            taskList = mlist
 
 
             activity?.runOnUiThread {
                 recycleSetup(mlist)
+
 
             }
 
@@ -134,7 +150,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     fun recycleSetup(list: ArrayList<TaskItem>) {
         binding.taskRecycle.layoutManager = LinearLayoutManager(context)
-        binding.taskRecycle.adapter = TasksAdpater(list)
+        tasksAdpater = TasksAdpater(list)
+        binding.taskRecycle.adapter = tasksAdpater
     }
 
     fun deleteall() {
@@ -194,7 +211,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         popupMenu.show()
     }
 
-    fun ordernameUp(){
+    fun ordernameUp() {
         println("order up")
         val db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
@@ -207,7 +224,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         }
     }
 
-    fun ordernameD(){
+    fun ordernameD() {
         val db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
             mlist = db.daoitems().sortbynamDesc() as ArrayList<TaskItem>
@@ -219,29 +236,42 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         }
     }
 
-    fun deleteOneItem (position : Int){
+    fun fakeDelete(position: Int) {
+        val item = taskList?.get(position)
+        taskList?.remove(item)
+        recycleSetup(taskList!!)
+
+        showSnack()
 
 
-       val item = mlist[position]
-        val db = DatabaseTasks.getInstance(context)
+    }
+
+    fun deleteOneItem(position: Int) {
+        var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
+            mlist = db.daoitems().getdata() as ArrayList<TaskItem>
+            val item = mlist[position]
             db.daoitems().delete(item)
-            activity?.runOnUiThread {
-               // recycleSetup(mlist)
-                getData()
-
-            }
         }
     }
 
-    val swipeGesture = object : SwipeOnTouch(){
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    fun showSnack() {
+        val snackbar = Snackbar.make(
+            binding.tasksLayout,
+            "you have just deleted an item",
+            Snackbar.LENGTH_LONG
+        )
+        snackbar.duration = 4000
+        snackbar.setAction("Undo", View.OnClickListener {
+            getData()
+            realDelete = true
 
-            if (direction==ItemTouchHelper.RIGHT){
-                deleteOneItem(viewHolder.adapterPosition)
-            }
-            super.onSwiped(viewHolder, direction)
-        }
+        })
+        snackbar.show()
+
+    }
+
+    override fun onClick(p0: View?) {
     }
 
 
