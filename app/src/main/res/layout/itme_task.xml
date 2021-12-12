@@ -8,42 +8,52 @@
 
     android:padding="8dp">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:weightSum="100">
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="1dp"
+        app:cardCornerRadius="10dp">
 
-        <ImageView
-            android:id="@+id/importantImg"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_weight="20"
-            app:srcCompat="@drawable/important" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="100">
 
-        <TextView
-            android:id="@+id/taskTV"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            <ImageView
+                android:id="@+id/importantImg"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_weight="20"
+                app:srcCompat="@drawable/important" />
 
-            android:layout_weight="80"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-black"
-            android:maxLines="1"
-            android:text="TextView"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/taskTV"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
 
-        <CheckBox
-            android:id="@+id/checkItem"
+                android:layout_weight="80"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-black"
+                android:maxLines="1"
+                android:text="TextView"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="20"
-            android:gravity="center" />
-    </LinearLayout>
+            <CheckBox
+                android:id="@+id/checkItem"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="20"
+                android:gravity="center" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>

@@ -1,28 +1,32 @@
 package com.example.todoff.data
 
 import androidx.room.*
-import com.example.todoff.data.TaskItem
-import kotlinx.coroutines.flow.Flow
 
 
 @Dao
 interface DaoItems {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
- fun insert_update (taskItem: TaskItem)
+    fun insert_update(taskItem: TaskItem)
 
- @Delete
-fun delete (taskItem: TaskItem)
+    @Delete
+    fun delete(taskItem: TaskItem)
 
-@Query("Select * from task_database")
-fun getdata () : List<TaskItem>
+    @Query("Select * from task_database")
+    fun getdata(): List<TaskItem>
 
-@Query("Delete from task_database")
-fun deleteall()
+    @Query("Delete from task_database")
+    fun deleteall()
 
 
-@Query("Select * From task_database Where title Like '%' || :search || '%'")
-fun search(search : String) : List<TaskItem>
+    @Query("Select * From task_database Where title Like '%' || :search || '%'")
+    fun search(search: String): List<TaskItem>
+
+    @Query("Select * From task_database Order by title Asc")
+    fun sortbynamAsc () : List<TaskItem>
+
+    @Query("Select * From task_database Order by title DESC")
+    fun sortbynamDesc () : List<TaskItem>
 
 
 }

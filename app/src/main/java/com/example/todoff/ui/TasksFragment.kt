@@ -3,15 +3,14 @@ package com.example.todoff.ui
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import android.widget.Adapter
-import android.widget.Toast
+import android.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoff.R
-import androidx.appcompat.widget.SearchView;
-
 import com.example.todoff.adapter.TasksAdpater
 import com.example.todoff.data.DatabaseTasks
 import com.example.todoff.data.TaskItem
@@ -35,20 +34,32 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         inflater.inflate(R.menu.app_icons, menu)
         val search = menu.findItem(R.id.search)
         val searchView = search.actionView as SearchView
-        //searchView.isSubmitButtonEnabled=true
         searchView.setOnQueryTextListener(this)
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.delete -> {
                 deleteall()
+                return true
+            }
+            R.id.order -> {
+                showOrderMenue()
+                deleteOneItem(1)
+                when (item.itemId) {
+                    R.id.nameUp -> ordernameD()
+
+                    R.id.namdeD->ordernameUp()
+
+                }
 
                 return true
-
-
             }
-
+            R.id.nameUp -> {
+                ordernameD()
+                return  true
+            }
             else -> {
                 println("hi")
                 return true
@@ -73,16 +84,30 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
             val action = TasksFragmentDirections.actionTasksFragmentToAddFragment()
             findNavController().navigate(action)
 
-
-
-
         }
-
         getData()
 
+       val itemTouchHelperCallback= object : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT){
+           override fun onMove(
+               recyclerView: RecyclerView,
+               viewHolder: RecyclerView.ViewHolder,
+               target: RecyclerView.ViewHolder
+           ): Boolean {
+               return false
 
-        //  binding.taskRecycle.layoutManager=LinearLayoutManager(context)
-        // binding.taskRecycle.adapter=TasksAdpater(taskList!!)
+           }
+
+           override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+               deleteOneItem(viewHolder.adapterPosition)
+
+
+
+
+           }
+       }
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(binding.taskRecycle)
 
     }
 
@@ -96,7 +121,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
             mlist = db.daoitems().getdata() as ArrayList<TaskItem>
-            taskList = mlist
+
 
             activity?.runOnUiThread {
                 recycleSetup(mlist)
@@ -110,7 +135,6 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     fun recycleSetup(list: ArrayList<TaskItem>) {
         binding.taskRecycle.layoutManager = LinearLayoutManager(context)
         binding.taskRecycle.adapter = TasksAdpater(list)
-
     }
 
     fun deleteall() {
@@ -148,26 +172,76 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         TODO("Not yet implemented")
     }
 
-
     fun searchData(query: String) {
         tempList?.clear()
-
-
         val db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
             mlist = db.daoitems().search(query) as ArrayList<TaskItem>
-            println(mlist!!.size)
-
             activity?.runOnUiThread {
-
                 recycleSetup(mlist)
-                println(mlist)
-
             }
 
 
         }
 
+    }
+
+    fun showOrderMenue() {
+
+        var view: View = activity!!.findViewById(R.id.order)
+        val popupMenu: PopupMenu = PopupMenu(context, view)
+        popupMenu.menuInflater.inflate(R.menu.order_menue, popupMenu.menu)
+        popupMenu.show()
+    }
+
+    fun ordernameUp(){
+        println("order up")
+        val db = DatabaseTasks.getInstance(context)
+        DatabaseTasks.db_write.execute {
+            mlist = db.daoitems().sortbynamAsc() as ArrayList<TaskItem>
+            activity?.runOnUiThread {
+                recycleSetup(mlist)
+            }
+
+
+        }
+    }
+
+    fun ordernameD(){
+        val db = DatabaseTasks.getInstance(context)
+        DatabaseTasks.db_write.execute {
+            mlist = db.daoitems().sortbynamDesc() as ArrayList<TaskItem>
+            activity?.runOnUiThread {
+                recycleSetup(mlist)
+            }
+
+
+        }
+    }
+
+    fun deleteOneItem (position : Int){
+
+
+       val item = mlist[position]
+        val db = DatabaseTasks.getInstance(context)
+        DatabaseTasks.db_write.execute {
+            db.daoitems().delete(item)
+            activity?.runOnUiThread {
+               // recycleSetup(mlist)
+                getData()
+
+            }
+        }
+    }
+
+    val swipeGesture = object : SwipeOnTouch(){
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+            if (direction==ItemTouchHelper.RIGHT){
+                deleteOneItem(viewHolder.adapterPosition)
+            }
+            super.onSwiped(viewHolder, direction)
+        }
     }
 
 

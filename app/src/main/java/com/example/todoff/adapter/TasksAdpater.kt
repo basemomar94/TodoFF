@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.todoff.R
 import com.example.todoff.data.TaskItem
 
-class TasksAdpater(private val mList: ArrayList<TaskItem>) :
+class TasksAdpater(
+    private val mList: ArrayList<TaskItem>,
+  //  val clickListener: View.OnClickListener
+
+) :
     RecyclerView.Adapter<TasksAdpater.ViewHolder>() {
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),View.OnClickListener {
-
-
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
 
         val title: TextView = itemView.findViewById(R.id.taskTV)
@@ -26,7 +28,7 @@ class TasksAdpater(private val mList: ArrayList<TaskItem>) :
 
         init {
             itemView.setOnClickListener {
-             itemView.setOnClickListener(this)
+                itemView.setOnClickListener(this)
             }
         }
 
@@ -50,6 +52,11 @@ class TasksAdpater(private val mList: ArrayList<TaskItem>) :
         holder.important.isVisible = itemsList.important == 1
         holder.important.isInvisible = itemsList.important == 0
         holder.title.paint.isStrikeThruText = itemsList.done == 1
+        holder.itemView.setOnClickListener {
+
+            //  clickListener.onClick(it)
+
+        }
 
 
     }
