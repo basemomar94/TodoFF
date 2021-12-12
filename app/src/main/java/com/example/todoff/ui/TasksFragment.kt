@@ -2,7 +2,6 @@ package com.example.todoff.ui
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 import android.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -29,12 +28,16 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     var realDelete: Boolean = true
     var tasksAdpater: TasksAdpater? = null
     var tempList: ArrayList<TaskItem>? = null
+    var snackbar: Snackbar? = null
     lateinit var mlist: ArrayList<TaskItem>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
 
+
+
+/////////////////////////////////////AppBar Icons ////////////////////////////////////////////////////////////////////////////
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_icons, menu)
@@ -93,6 +96,9 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         }
         getData()
 
+
+ //////////////////SWIPE SETUP////////////////////////////////////////////////////////////////////////////////////////////
+
         val itemTouchHelperCallback =
             object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
                 override fun onMove(
@@ -109,13 +115,6 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                     position = viewHolder.absoluteAdapterPosition
 
                     fakeDelete(viewHolder.absoluteAdapterPosition)
-                    Handler().postDelayed({
-                        println("realDelete $realDelete")
-                        if (realDelete) {
-                            deleteOneItem(position!!)
-                        }
-
-                    }, 4000)
 
 
                 }
@@ -131,28 +130,30 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         _binding = null
     }
 
+
+/////////////////Getting Data/////////////////////////////////////////////////////////////////////////////////
     fun getData() {
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
             mlist = db.daoitems().getdata() as ArrayList<TaskItem>
             taskList = mlist
-
-
             activity?.runOnUiThread {
                 recycleSetup(mlist)
-
-
             }
-
         }
-
     }
+
+
+////////////////////Recycle setup/////////////////////////////////////////////////////////////////////////////////
 
     fun recycleSetup(list: ArrayList<TaskItem>) {
         binding.taskRecycle.layoutManager = LinearLayoutManager(context)
         tasksAdpater = TasksAdpater(list)
         binding.taskRecycle.adapter = tasksAdpater
     }
+
+
+/////////////////delete all items/////////////////////////////////////////////////////////////////////////////////
 
     fun deleteall() {
         val builder = AlertDialog.Builder(context)
@@ -174,6 +175,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 
     }
+///////////////// Search /////////////////////////////////////////////////////////////////////////////////////////////////
 
     override fun onQueryTextSubmit(query: String): Boolean {
 
@@ -236,6 +238,9 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         }
     }
 
+
+/////////////////Fake delete one item/////////////////////////////////////////////////////////////////////////////////
+
     fun fakeDelete(position: Int) {
         val item = taskList?.get(position)
         taskList?.remove(item)
@@ -245,6 +250,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 
     }
+/////////////////Real delete one item/////////////////////////////////////////////////////////////////////////////////
 
     fun deleteOneItem(position: Int) {
         var db = DatabaseTasks.getInstance(context)
@@ -254,20 +260,42 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
             db.daoitems().delete(item)
         }
     }
+/////////////////Snack bar/////////////////////////////////////////////////////////////////////////////////
 
     fun showSnack() {
-        val snackbar = Snackbar.make(
+        snackbar = Snackbar.make(
             binding.tasksLayout,
             "you have just deleted an item",
             Snackbar.LENGTH_LONG
-        )
-        snackbar.duration = 4000
-        snackbar.setAction("Undo", View.OnClickListener {
+        ).addCallback(object : Snackbar.Callback() {
+
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+                //deleteOneItem(position!!)
+                println("dismissed")
+                println(realDelete)
+                if (realDelete) {
+                    deleteOneItem(position!!)
+                } else {
+                    realDelete = true
+                }
+
+            }
+
+            override fun onShown(sb: Snackbar?) {
+                super.onShown(sb)
+
+            }
+        })
+
+
+        snackbar!!.setAction("Undo", View.OnClickListener {
             getData()
-            realDelete = true
+            realDelete = false
 
         })
-        snackbar.show()
+
+        snackbar!!.show()
 
     }
 
