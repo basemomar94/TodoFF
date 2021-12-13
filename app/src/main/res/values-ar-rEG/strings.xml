@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="todo_item">مهمة جديدة</string>
+    <string name="mark_as_important">مهمة جدا</string>
+</resources>

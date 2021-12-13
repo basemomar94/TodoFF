@@ -19,14 +19,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="todo item"
+            android:hint="@string/"
             android:inputType="text" />
 
         <CheckBox
             android:id="@+id/AddCheckbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Mark as important" />
+            android:text="@string/mark_as_important" />
 
         <TextView
             android:id="@+id/textView2"

@@ -42,7 +42,7 @@ class Splash : Fragment() {
         Handler().postDelayed({
             val action=SplashDirections.actionSplashToTasksFragment()
             findNavController().navigate(action)
-        },1000)
+        },1200)
 
 
         (activity as AppCompatActivity).supportActionBar?.hide()

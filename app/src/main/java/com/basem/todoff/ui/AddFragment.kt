@@ -27,6 +27,8 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
         savedInstanceState: Bundle?
     ): View? {
         (activity as AppCompatActivity).supportActionBar?.show()
+        (activity as AppCompatActivity).supportActionBar?.title = "Add a new task"
+
 
 
         _binding = AddFragmentBinding.inflate(inflater, container, false)
@@ -41,12 +43,7 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
         binding.itemET.showSoftInputOnFocus
         binding.itemET.showKeyboard()
 
-
-
-
-
         activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-
         binding.floatingActionButton.setOnClickListener {
             addtoDatabase()
         }
@@ -92,9 +89,9 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
-    private fun View.hideKeyboard (){
-        val imm= context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY,0)
+    private fun View.hideKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
     }
 
 
