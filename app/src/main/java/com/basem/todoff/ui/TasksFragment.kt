@@ -118,7 +118,6 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                     //  snackbar?.dismiss()
 
                     position = viewHolder.absoluteAdapterPosition
-                    println(position)
                     fakeDelete(viewHolder.absoluteAdapterPosition!!)
                 }
             }
@@ -247,11 +246,16 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     fun fakeDelete(p: Int) {
 
         val item = taskList?.get(p)
-        taskList?.remove(item)
-        recycleSetup(taskList!!)
+        if (item?.done == 1) {
 
-
-        showSnack()
+            taskList?.remove(item)
+            recycleSetup(taskList!!)
+            showSnack()
+        } else {
+            println("done first")
+            recycleSetup(taskList!!)
+            Snackbar.make(binding.tasksLayout, "Make it done first", Snackbar.LENGTH_SHORT).show()
+        }
 
 
     }
@@ -299,27 +303,28 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         snackbar!!.setAction("Undo", View.OnClickListener {
             getData()
             realDelete = false
-
         })
 
-
-
         snackbar!!.view.setPadding(0, 0, 0, 0)
-
         snackbar!!.show()
 
     }
 
     override fun onClick(position: Int) {
         update(position)
-
     }
 
     fun update(p: Int) {
-        val position = mlist[p].id
+        val done = mlist[p].done
+        val key = mlist[p].id
         val db = DatabaseTasks.getInstance(context)
+
+
+
         DatabaseTasks.db_write.execute {
-            db.daoitems().update(position)
+            if (done==0){
+                db.daoitems().done(key)
+            }else {db.daoitems().undone(key)}
             activity?.runOnUiThread {
                 getData()
             }

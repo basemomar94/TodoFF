@@ -32,5 +32,9 @@ interface DaoItems {
     fun important () : List<TaskItem>
 
     @Query("Update task_database Set done = 1 Where id=:keyid")
-   fun update(keyid: Int)
+   fun done(keyid: Int)
+
+
+    @Query("Update task_database Set done = 0 Where id=:keyid")
+    fun undone(keyid: Int)
 }
