@@ -9,13 +9,6 @@
         app:showAsAction="always"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
     <item
-        android:id="@+id/order"
-
-        android:icon="@drawable/ic_baseline_filter_list_24"
-        android:title="Item"
-        app:showAsAction="always"
-        app:actionViewClass="androidx.appcompat.widget.MenuPopupWindow$MenuDropDownListView" />
-    <item
         android:id="@+id/delete"
         android:icon="@drawable/ic_baseline_delete_forever_24"
         android:title="Item"

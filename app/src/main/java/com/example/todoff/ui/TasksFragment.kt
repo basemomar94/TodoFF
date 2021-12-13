@@ -3,7 +3,6 @@ package com.example.todoff.ui
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import android.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -18,7 +17,7 @@ import com.example.todoff.databinding.TasksFragmentBinding
 import com.google.android.material.snackbar.Snackbar
 
 class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTextListener,
-    View.OnClickListener {
+    TasksAdpater.Myclicklisener {
     lateinit var adpater: TasksAdpater
     var _binding: TasksFragmentBinding? = null
     val binding get() = _binding!!
@@ -53,7 +52,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 deleteall()
                 return true
             }
-            R.id.order -> {
+           /* R.id.order -> {
                 showOrderMenue()
 
                 when (item.itemId) {
@@ -64,7 +63,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 }
 
                 return true
-            }
+            }*/
             R.id.nameUp -> {
                 ordernameD()
                 return true
@@ -87,11 +86,14 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+/////////////floating button /////////////////////////////////////
         binding.floatingActionButton2.setOnClickListener {
             println("float")
             searchData("b")
             val action = TasksFragmentDirections.actionTasksFragmentToAddFragment()
             findNavController().navigate(action)
+            update(1)
 
         }
         getData()
@@ -111,6 +113,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 }
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                  //  snackbar?.dismiss()
 
                     position = viewHolder.absoluteAdapterPosition
 
@@ -135,7 +138,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     fun getData() {
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().getdata() as ArrayList<TaskItem>
+            mlist = db.daoitems().important() as ArrayList<TaskItem>
             taskList = mlist
             activity?.runOnUiThread {
                 recycleSetup(mlist)
@@ -148,7 +151,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     fun recycleSetup(list: ArrayList<TaskItem>) {
         binding.taskRecycle.layoutManager = LinearLayoutManager(context)
-        tasksAdpater = TasksAdpater(list)
+        tasksAdpater = TasksAdpater(list,this)
         binding.taskRecycle.adapter = tasksAdpater
     }
 
@@ -205,13 +208,13 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     }
 
-    fun showOrderMenue() {
+  /*  fun showOrderMenue() {
 
         var view: View = activity!!.findViewById(R.id.order)
         val popupMenu: PopupMenu = PopupMenu(context, view)
         popupMenu.menuInflater.inflate(R.menu.order_menue, popupMenu.menu)
         popupMenu.show()
-    }
+    }*/
 
     fun ordernameUp() {
         println("order up")
@@ -246,6 +249,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         taskList?.remove(item)
         recycleSetup(taskList!!)
 
+
         showSnack()
 
 
@@ -255,7 +259,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     fun deleteOneItem(position: Int) {
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().getdata() as ArrayList<TaskItem>
+            mlist = db.daoitems().important() as ArrayList<TaskItem>
             val item = mlist[position]
             db.daoitems().delete(item)
         }
@@ -263,6 +267,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 /////////////////Snack bar/////////////////////////////////////////////////////////////////////////////////
 
     fun showSnack() {
+        snackbar?.dismiss()
+
         snackbar = Snackbar.make(
             binding.tasksLayout,
             "you have just deleted an item",
@@ -295,11 +301,26 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
         })
 
+
+
+        snackbar!!.view.setPadding(0,0,0,0)
+
         snackbar!!.show()
 
     }
 
-    override fun onClick(p0: View?) {
+    override fun onClick(position: Int) {
+       update(position)
+
+    }
+    fun update(p :Int){
+        val db = DatabaseTasks.getInstance(context)
+        DatabaseTasks.db_write.execute {
+         //   db.daoitems().update()
+            activity?.runOnUiThread {
+                getData()
+            }
+        }
     }
 
 

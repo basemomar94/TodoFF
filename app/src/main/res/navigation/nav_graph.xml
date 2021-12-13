@@ -23,6 +23,10 @@
         tools:layout="@layout/add_fragment" >
         <action
             android:id="@+id/action_addFragment_to_tasksFragment"
-            app:destination="@id/tasksFragment" />
+            app:destination="@id/tasksFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@+id/nav_graph"
+            app:popUpToInclusive="true"
+            />
     </fragment>
 </navigation>

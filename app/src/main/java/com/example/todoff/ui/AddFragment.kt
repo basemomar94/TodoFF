@@ -71,6 +71,7 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
 
                     val action = AddFragmentDirections.actionAddFragmentToTasksFragment()
                     findNavController().navigate(action)
+
                 }
 
 
