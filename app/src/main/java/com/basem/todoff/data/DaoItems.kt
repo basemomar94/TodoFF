@@ -28,9 +28,9 @@ interface DaoItems {
     @Query("Select * From task_database Order by title DESC")
     fun sortbynamDesc () : List<TaskItem>
 
-    @Query("Select * From task_database Order by important Desc")
+    @Query("Select * From task_database Order by done Asc,important Desc")
     fun important () : List<TaskItem>
 
-   /* @Query("Update task_database Set done = 1")
-   fun update(taskItem: TaskItem)*/
+    @Query("Update task_database Set done = 1 Where id=:keyid")
+   fun update(keyid: Int)
 }

@@ -95,7 +95,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
             searchData("b")
             val action = TasksFragmentDirections.actionTasksFragmentToAddFragment()
             findNavController().navigate(action)
-            update(1)
+
 
         }
         getData()
@@ -118,10 +118,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                     //  snackbar?.dismiss()
 
                     position = viewHolder.absoluteAdapterPosition
-
-                    fakeDelete(viewHolder.absoluteAdapterPosition)
-
-
+                    println(position)
+                    fakeDelete(viewHolder.absoluteAdapterPosition!!)
                 }
             }
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
@@ -246,8 +244,9 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 /////////////////Fake delete one item/////////////////////////////////////////////////////////////////////////////////
 
-    fun fakeDelete(position: Int) {
-        val item = taskList?.get(position)
+    fun fakeDelete(p: Int) {
+
+        val item = taskList?.get(p)
         taskList?.remove(item)
         recycleSetup(taskList!!)
 
@@ -317,9 +316,10 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     }
 
     fun update(p: Int) {
+        val position = mlist[p].id
         val db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            //   db.daoitems().update()
+            db.daoitems().update(position)
             activity?.runOnUiThread {
                 getData()
             }
