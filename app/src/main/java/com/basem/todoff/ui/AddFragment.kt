@@ -1,4 +1,4 @@
-package com.example.todoff.ui
+package com.basem.todoff.ui
 
 import android.content.Context
 import android.os.Bundle
@@ -8,12 +8,13 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.todoff.R
-import com.example.todoff.data.DatabaseTasks
-import com.example.todoff.data.TaskItem
-import com.example.todoff.databinding.AddFragmentBinding
+import com.basem.todoff.R
+import com.basem.todoff.data.DatabaseTasks
+import com.basem.todoff.data.TaskItem
+import com.basem.todoff.databinding.AddFragmentBinding
 
 class AddFragment() : Fragment(R.layout.add_fragment) {
 
@@ -25,6 +26,8 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (activity as AppCompatActivity).supportActionBar?.show()
+
 
         _binding = AddFragmentBinding.inflate(inflater, container, false)
 

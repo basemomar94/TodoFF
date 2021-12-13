@@ -1,19 +1,20 @@
-package com.example.todoff.ui
+package com.basem.todoff.ui
 
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.todoff.R
-import com.example.todoff.adapter.TasksAdpater
-import com.example.todoff.data.DatabaseTasks
-import com.example.todoff.data.TaskItem
-import com.example.todoff.databinding.TasksFragmentBinding
+import com.basem.todoff.R
+import com.basem.todoff.adapter.TasksAdpater
+import com.basem.todoff.data.DatabaseTasks
+import com.basem.todoff.data.TaskItem
+import com.basem.todoff.databinding.TasksFragmentBinding
 import com.google.android.material.snackbar.Snackbar
 
 class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTextListener,
@@ -35,8 +36,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     }
 
 
-
-/////////////////////////////////////AppBar Icons ////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////AppBar Icons ////////////////////////////////////////////////////////////////////////////
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_icons, menu)
@@ -52,18 +52,18 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 deleteall()
                 return true
             }
-           /* R.id.order -> {
-                showOrderMenue()
+            /* R.id.order -> {
+                 showOrderMenue()
 
-                when (item.itemId) {
-                    R.id.nameUp -> ordernameD()
+                 when (item.itemId) {
+                     R.id.nameUp -> ordernameD()
 
-                    R.id.namdeD -> ordernameUp()
+                     R.id.namdeD -> ordernameUp()
 
-                }
+                 }
 
-                return true
-            }*/
+                 return true
+             }*/
             R.id.nameUp -> {
                 ordernameD()
                 return true
@@ -80,6 +80,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (activity as AppCompatActivity).supportActionBar?.show()
+
         _binding = TasksFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -99,7 +101,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         getData()
 
 
- //////////////////SWIPE SETUP////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////SWIPE SETUP////////////////////////////////////////////////////////////////////////////////////////////
 
         val itemTouchHelperCallback =
             object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
@@ -113,7 +115,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 }
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                  //  snackbar?.dismiss()
+                    //  snackbar?.dismiss()
 
                     position = viewHolder.absoluteAdapterPosition
 
@@ -134,7 +136,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     }
 
 
-/////////////////Getting Data/////////////////////////////////////////////////////////////////////////////////
+    /////////////////Getting Data/////////////////////////////////////////////////////////////////////////////////
     fun getData() {
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
@@ -151,7 +153,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     fun recycleSetup(list: ArrayList<TaskItem>) {
         binding.taskRecycle.layoutManager = LinearLayoutManager(context)
-        tasksAdpater = TasksAdpater(list,this)
+        tasksAdpater = TasksAdpater(list, this)
         binding.taskRecycle.adapter = tasksAdpater
     }
 
@@ -208,13 +210,13 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     }
 
-  /*  fun showOrderMenue() {
+    /*  fun showOrderMenue() {
 
-        var view: View = activity!!.findViewById(R.id.order)
-        val popupMenu: PopupMenu = PopupMenu(context, view)
-        popupMenu.menuInflater.inflate(R.menu.order_menue, popupMenu.menu)
-        popupMenu.show()
-    }*/
+          var view: View = activity!!.findViewById(R.id.order)
+          val popupMenu: PopupMenu = PopupMenu(context, view)
+          popupMenu.menuInflater.inflate(R.menu.order_menue, popupMenu.menu)
+          popupMenu.show()
+      }*/
 
     fun ordernameUp() {
         println("order up")
@@ -303,20 +305,21 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 
 
-        snackbar!!.view.setPadding(0,0,0,0)
+        snackbar!!.view.setPadding(0, 0, 0, 0)
 
         snackbar!!.show()
 
     }
 
     override fun onClick(position: Int) {
-       update(position)
+        update(position)
 
     }
-    fun update(p :Int){
+
+    fun update(p: Int) {
         val db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-         //   db.daoitems().update()
+            //   db.daoitems().update()
             activity?.runOnUiThread {
                 getData()
             }

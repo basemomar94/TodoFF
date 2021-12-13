@@ -1,4 +1,4 @@
-package com.example.todoff.adapter
+package com.basem.todoff.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +9,8 @@ import android.widget.TextView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.example.todoff.R
-import com.example.todoff.data.TaskItem
+import com.basem.todoff.R
+import com.basem.todoff.data.TaskItem
 
 class TasksAdpater(
     private val mList: ArrayList<TaskItem>,
