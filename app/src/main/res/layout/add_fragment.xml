@@ -13,15 +13,13 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:orientation="vertical">
-
         <EditText
             android:id="@+id/item_ET"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/"
+            android:hint="add a new task"
             android:inputType="text" />
-
         <CheckBox
             android:id="@+id/AddCheckbox"
             android:layout_width="match_parent"
@@ -34,7 +32,6 @@
             android:layout_height="wrap_content"
             android:text="20-11-2021"
             android:visibility="gone" />
-
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

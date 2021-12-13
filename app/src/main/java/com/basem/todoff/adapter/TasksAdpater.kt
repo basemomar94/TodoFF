@@ -14,7 +14,8 @@ import com.basem.todoff.data.TaskItem
 
 class TasksAdpater(
     private val mList: ArrayList<TaskItem>,
-    val listner: Myclicklisener
+    val listner: Myclicklisener,
+   
 
 ) :
     RecyclerView.Adapter<TasksAdpater.ViewHolder>() {
@@ -33,6 +34,7 @@ class TasksAdpater(
                 listner.onClick(position)
 
             }
+
         }
 
 
@@ -50,6 +52,8 @@ class TasksAdpater(
         holder.important.isVisible = itemview.important == 1
         holder.important.isInvisible = itemview.important == 0
         holder.title.paint.isStrikeThruText = itemview.done == 1
+
+
 
 
 
