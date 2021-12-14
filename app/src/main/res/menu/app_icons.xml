@@ -13,5 +13,4 @@
         android:icon="@drawable/ic_baseline_delete_forever_24"
         android:title="Item"
         app:showAsAction="always" />
-    <item android:title="@string/settings" />
 </menu>

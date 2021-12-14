@@ -29,8 +29,6 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
         (activity as AppCompatActivity).supportActionBar?.show()
         (activity as AppCompatActivity).supportActionBar?.title = "Add a new task"
 
-
-
         _binding = AddFragmentBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -71,13 +69,12 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
 
                     val action = AddFragmentDirections.actionAddFragmentToTasksFragment()
                     findNavController().navigate(action)
-
                 }
-
-
             }
 
         } else {
+
+         //   Snackbar.make(binding.addlayout,"Enter an item",Snackbar.LENGTH_SHORT).show()
 
             Toast.makeText(context, "Enter an item", Toast.LENGTH_LONG).show()
 

@@ -81,6 +81,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         savedInstanceState: Bundle?
     ): View? {
         (activity as AppCompatActivity).supportActionBar?.show()
+        (activity as AppCompatActivity).supportActionBar?.title = "Todo"
 
         _binding = TasksFragmentBinding.inflate(inflater, container, false)
         return binding.root
@@ -91,8 +92,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 /////////////floating button /////////////////////////////////////
         binding.floatingActionButton2.setOnClickListener {
-            println("float")
-            searchData("b")
+
             val action = TasksFragmentDirections.actionTasksFragmentToAddFragment()
             findNavController().navigate(action)
 
@@ -166,6 +166,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 DatabaseTasks.db_write.execute {
                     db.daoitems().deleteall()
                     activity?.runOnUiThread {
+
+                        tasksAdpater?.notifyDataSetChanged()
                         getData()
 
                     }

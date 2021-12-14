@@ -1,5 +1,6 @@
 package com.basem.todoff.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,7 @@ import com.basem.todoff.data.TaskItem
 class TasksAdpater(
     private val mList: ArrayList<TaskItem>,
     val listner: Myclicklisener,
-   
+
 
 ) :
     RecyclerView.Adapter<TasksAdpater.ViewHolder>() {
@@ -52,11 +53,10 @@ class TasksAdpater(
         holder.important.isVisible = itemview.important == 1
         holder.important.isInvisible = itemview.important == 0
         holder.title.paint.isStrikeThruText = itemview.done == 1
-
-
-
-
-
+        if (itemview.done==1){
+            holder.title.setTextColor(Color.GRAY)
+            holder.important.alpha= 0.4F
+        }
     }
 
     override fun getItemCount(): Int {
