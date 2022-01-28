@@ -14,11 +14,11 @@ import com.basem.todoff.R
 import com.basem.todoff.data.TaskItem
 
 class TasksAdpater(
-    private val mList: ArrayList<TaskItem>,
+    private val mList: MutableList<TaskItem>,
     val listner: Myclicklisener,
 
 
-) :
+    ) :
     RecyclerView.Adapter<TasksAdpater.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -48,7 +48,7 @@ class TasksAdpater(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val itemview = mList[position]
-        holder.title.text = itemview.title
+        holder.title.text = itemview!!.title
         holder.check.isChecked = itemview.done == 1
         holder.important.isVisible = itemview.important == 1
         holder.important.isInvisible = itemview.important == 0
@@ -56,6 +56,9 @@ class TasksAdpater(
         if (itemview.done==1){
             holder.title.setTextColor(Color.GRAY)
             holder.important.alpha= 0.4F
+        } else {
+            holder.title.setTextColor(Color.BLACK)
+            holder.important.alpha= 1F
         }
     }
 

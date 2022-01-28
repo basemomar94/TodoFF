@@ -53,15 +53,23 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
         val model = TaskItem()
         var title: String = binding.itemET.text.toString()
         var important: Int = 0
+        var done: Int = 0
         if (binding.AddCheckbox.isChecked) {
             important = 1
+            done = -3
+
         }
         if (binding.itemET.text.isNotEmpty()) {
             model.title = title
             model.important = important
+            model.done = done
+
+
             val db = DatabaseTasks.getInstance(context)
             DatabaseTasks.db_write.execute {
                 db.daoitems().insert_update(model)
+
+
                 binding.itemET.text.clear()
                 activity?.runOnUiThread {
                     binding.floatingActionButton.hideKeyboard()
@@ -74,7 +82,7 @@ class AddFragment() : Fragment(R.layout.add_fragment) {
 
         } else {
 
-         //   Snackbar.make(binding.addlayout,"Enter an item",Snackbar.LENGTH_SHORT).show()
+            //   Snackbar.make(binding.addlayout,"Enter an item",Snackbar.LENGTH_SHORT).show()
 
             Toast.makeText(context, "Enter an item", Toast.LENGTH_LONG).show()
 

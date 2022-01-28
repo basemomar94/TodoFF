@@ -19,20 +19,22 @@ import com.google.android.material.snackbar.Snackbar
 
 class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTextListener,
     TasksAdpater.Myclicklisener {
-    lateinit var adpater: TasksAdpater
     var _binding: TasksFragmentBinding? = null
     val binding get() = _binding!!
-    var taskList: ArrayList<TaskItem>? = null
-    var query: String? = null
     var position: Int? = null
-    var realDelete: Boolean = true
     var tasksAdpater: TasksAdpater? = null
-    var tempList: ArrayList<TaskItem>? = null
-    var snackbar: Snackbar? = null
-    lateinit var mlist: ArrayList<TaskItem>
+    var tempList: MutableList<TaskItem>? = null
+    var sortedList: MutableList<TaskItem> = mutableListOf()
+    var mlist: MutableList<TaskItem> = mutableListOf()
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+
+
     }
 
 
@@ -52,20 +54,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 deleteall()
                 return true
             }
-            /* R.id.order -> {
-                 showOrderMenue()
-
-                 when (item.itemId) {
-                     R.id.nameUp -> ordernameD()
-
-                     R.id.namdeD -> ordernameUp()
-
-                 }
-
-                 return true
-             }*/
             R.id.nameUp -> {
-                ordernameD()
                 return true
             }
             else -> {
@@ -92,6 +81,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 /////////////floating button /////////////////////////////////////
         binding.floatingActionButton2.setOnClickListener {
+            mlist.clear()
 
             val action = TasksFragmentDirections.actionTasksFragmentToAddFragment()
             findNavController().navigate(action)
@@ -99,6 +89,9 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
         }
         getData()
+
+
+        recycleSetup( mlist)
 
 
         //////////////////SWIPE SETUP////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +111,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                     //  snackbar?.dismiss()
 
                     position = viewHolder.absoluteAdapterPosition
-                    fakeDelete(viewHolder.absoluteAdapterPosition!!)
+                    deleteOneItem(viewHolder.absoluteAdapterPosition)
                 }
             }
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
@@ -137,10 +130,20 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     fun getData() {
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().important() as ArrayList<TaskItem>
-            taskList = mlist
+            val datalist = db.daoitems().important() as ArrayList<TaskItem>
+            for (todo in datalist) {
+                mlist.add(todo)
+
+
+            }
+            if (mlist.isNotEmpty()) {
+
+
+            } else {
+                println("Empty")
+            }
             activity?.runOnUiThread {
-                recycleSetup(mlist)
+                tasksAdpater?.notifyDataSetChanged()
             }
         }
     }
@@ -148,7 +151,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 ////////////////////Recycle setup/////////////////////////////////////////////////////////////////////////////////
 
-    fun recycleSetup(list: ArrayList<TaskItem>) {
+    fun recycleSetup(list: MutableList<TaskItem>) {
+        list.sortBy { it.done }
         binding.taskRecycle.layoutManager = LinearLayoutManager(context)
         tasksAdpater = TasksAdpater(list, this)
         binding.taskRecycle.adapter = tasksAdpater
@@ -165,10 +169,10 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
                 val db = DatabaseTasks.getInstance(context)
                 DatabaseTasks.db_write.execute {
                     db.daoitems().deleteall()
+                    mlist.clear()
                     activity?.runOnUiThread {
 
                         tasksAdpater?.notifyDataSetChanged()
-                        getData()
 
                     }
                 }
@@ -183,8 +187,7 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     override fun onQueryTextSubmit(query: String): Boolean {
 
-
-        TODO("Not yet implemented")
+        return false
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
@@ -192,16 +195,16 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
         searchData(newText)
         return false
 
-        TODO("Not yet implemented")
     }
 
     fun searchData(query: String) {
         tempList?.clear()
         val db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().search(query) as ArrayList<TaskItem>
+            val searchList = db.daoitems().search(query)
+
             activity?.runOnUiThread {
-                recycleSetup(mlist)
+                recycleSetup(searchList)
             }
 
 
@@ -209,126 +212,80 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     }
 
-    /*  fun showOrderMenue() {
-
-          var view: View = activity!!.findViewById(R.id.order)
-          val popupMenu: PopupMenu = PopupMenu(context, view)
-          popupMenu.menuInflater.inflate(R.menu.order_menue, popupMenu.menu)
-          popupMenu.show()
-      }*/
-
-    fun ordernameUp() {
-        println("order up")
-        val db = DatabaseTasks.getInstance(context)
-        DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().sortbynamAsc() as ArrayList<TaskItem>
-            activity?.runOnUiThread {
-                recycleSetup(mlist)
-            }
-
-
-        }
-    }
-
-    fun ordernameD() {
-        val db = DatabaseTasks.getInstance(context)
-        DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().sortbynamDesc() as ArrayList<TaskItem>
-            activity?.runOnUiThread {
-                recycleSetup(mlist)
-            }
-
-
-        }
-    }
-
-
-/////////////////Fake delete one item/////////////////////////////////////////////////////////////////////////////////
-
-    fun fakeDelete(p: Int) {
-
-        val item = taskList?.get(p)
-        if (item?.done == 1) {
-
-            taskList?.remove(item)
-            recycleSetup(taskList!!)
-            showSnack()
-        } else {
-            println("done first")
-            recycleSetup(taskList!!)
-            Snackbar.make(binding.tasksLayout, "Make it done first", Snackbar.LENGTH_SHORT).show()
-        }
-
-
-    }
 /////////////////Real delete one item/////////////////////////////////////////////////////////////////////////////////
 
     fun deleteOneItem(position: Int) {
+
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            mlist = db.daoitems().important() as ArrayList<TaskItem>
-            val item = mlist[position]
-            db.daoitems().delete(item)
-        }
-    }
-/////////////////Snack bar/////////////////////////////////////////////////////////////////////////////////
+            val todo = mlist[position]
+            if (todo!!.done == 1) {
+                if (mlist.isNotEmpty()) {
+                    db.daoitems().delete(todo!!)
+                    mlist.remove(todo)
+                    activity?.runOnUiThread {
+                        tasksAdpater?.notifyItemRemoved(position)
+                        Snackbar.make(requireView(), "todo deleted", Snackbar.LENGTH_LONG).apply {
+                            setAction("Undo") {
+                                saveItem(todo, position)
+                            }
+                        }.show()
+                    }
 
-    fun showSnack() {
-        snackbar?.dismiss()
-
-        snackbar = Snackbar.make(
-            binding.tasksLayout,
-            "you have just deleted an item",
-            Snackbar.LENGTH_LONG
-        ).addCallback(object : Snackbar.Callback() {
-
-            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                super.onDismissed(transientBottomBar, event)
-                //deleteOneItem(position!!)
-                println("dismissed")
-                println(realDelete)
-                if (realDelete) {
-                    deleteOneItem(position!!)
-                } else {
-                    realDelete = true
+                }
+            } else {
+                activity?.runOnUiThread {
+                    tasksAdpater?.notifyDataSetChanged()
+                    Snackbar.make(requireView(), "Make it done first", Snackbar.LENGTH_SHORT)
+                        .show()
                 }
 
             }
 
-            override fun onShown(sb: Snackbar?) {
-                super.onShown(sb)
 
-            }
-        })
-
-
-        snackbar!!.setAction("Undo", View.OnClickListener {
-            getData()
-            realDelete = false
-        })
-
-        snackbar!!.view.setPadding(0, 0, 0, 0)
-        snackbar!!.show()
-
+        }
     }
+
+    private fun saveItem(item: TaskItem, position: Int) {
+        val db = DatabaseTasks.getInstance(context)
+        DatabaseTasks.db_write.execute {
+            db.daoitems().insert_update(item)
+            mlist.add(position, item)
+
+            activity?.runOnUiThread {
+                tasksAdpater?.notifyItemInserted(position)
+            }
+        }
+    }
+/////////////////Snack bar/////////////////////////////////////////////////////////////////////////////////
 
     override fun onClick(position: Int) {
         update(position)
     }
 
     fun update(p: Int) {
-        val done = mlist[p].done
-        val key = mlist[p].id
+        val done = mlist[p]!!.done
+        val key = mlist[p]!!.id
+        val todo=mlist[p]
         val db = DatabaseTasks.getInstance(context)
 
 
 
+
         DatabaseTasks.db_write.execute {
-            if (done==0){
+            if (done == 0) {
                 db.daoitems().done(key)
-            }else {db.daoitems().undone(key)}
+                todo.done=1
+
+            } else {
+                db.daoitems().undone(key)
+                todo.done=0
+            }
             activity?.runOnUiThread {
-                getData()
+                tasksAdpater?.notifyDataSetChanged()
+                recycleSetup(mlist)
+
+
             }
         }
     }

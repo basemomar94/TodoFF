@@ -28,7 +28,7 @@ abstract class DatabaseTasks : RoomDatabase() {
             kotlin.synchronized(this) {
 
                 val instance = Room.databaseBuilder(
-                    context!!?.applicationContext,
+                    context!!.applicationContext,
                     DatabaseTasks::class.java,
                     DATABASE_NAME
                 ).build()

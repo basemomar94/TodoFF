@@ -13,26 +13,29 @@ interface DaoItems {
     fun delete(taskItem: TaskItem)
 
     @Query("Select * from task_database")
-    fun getdata(): List<TaskItem>
+    fun getdata(): MutableList<TaskItem>
 
     @Query("Delete from task_database")
     fun deleteall()
 
 
     @Query("Select * From task_database Where title Like '%' || :search || '%'")
-    fun search(search: String): List<TaskItem>
+    fun search(search: String): MutableList<TaskItem>
 
     @Query("Select * From task_database Order by title Asc")
-    fun sortbynamAsc () : List<TaskItem>
+    fun sortbynamAsc () : MutableList<TaskItem>
 
     @Query("Select * From task_database Order by title DESC")
-    fun sortbynamDesc () : List<TaskItem>
+    fun sortbynamDesc () : MutableList<TaskItem>
 
     @Query("Select * From task_database Order by done Asc,important Desc")
-    fun important () : List<TaskItem>
+    fun important () : MutableList<TaskItem>
 
     @Query("Update task_database Set done = 1 Where id=:keyid")
    fun done(keyid: Int)
+
+    @Query("Update task_database Set done = 3 Where id=:keyid")
+    fun makeImportant(keyid: Int)
 
 
     @Query("Update task_database Set done = 0 Where id=:keyid")
