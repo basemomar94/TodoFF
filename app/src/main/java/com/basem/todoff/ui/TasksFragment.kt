@@ -23,16 +23,15 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     val binding get() = _binding!!
     var position: Int? = null
     var tasksAdpater: TasksAdpater? = null
+    private var recyclerView: RecyclerView? = null
     var tempList: MutableList<TaskItem>? = null
     var sortedList: MutableList<TaskItem> = mutableListOf()
     var mlist: MutableList<TaskItem> = mutableListOf()
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
 
 
     }
@@ -88,10 +87,8 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
 
         }
-        getData()
-
-
-        recycleSetup( mlist)
+         getData()
+        recycleSetup(mlist)
 
 
         //////////////////SWIPE SETUP////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,34 +125,31 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
 
     /////////////////Getting Data/////////////////////////////////////////////////////////////////////////////////
     fun getData() {
+        var dataList: MutableList<TaskItem>
+        dataList = arrayListOf()
         var db = DatabaseTasks.getInstance(context)
         DatabaseTasks.db_write.execute {
-            val datalist = db.daoitems().important() as ArrayList<TaskItem>
-            for (todo in datalist) {
-                mlist.add(todo)
-
-
-            }
-            if (mlist.isNotEmpty()) {
-
-
-            } else {
-                println("Empty")
-            }
-            activity?.runOnUiThread {
+            dataList = db.daoitems().important()
+            dataList.forEach {
+                mlist.add(it)
                 tasksAdpater?.notifyDataSetChanged()
             }
+
         }
+
     }
 
 
 ////////////////////Recycle setup/////////////////////////////////////////////////////////////////////////////////
 
     fun recycleSetup(list: MutableList<TaskItem>) {
-        list.sortBy { it.done }
-        binding.taskRecycle.layoutManager = LinearLayoutManager(context)
         tasksAdpater = TasksAdpater(list, this)
-        binding.taskRecycle.adapter = tasksAdpater
+        recyclerView = view?.findViewById(R.id.taskRecycle)
+        recyclerView?.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = tasksAdpater
+            setHasFixedSize(true)
+        }
     }
 
 
@@ -198,17 +192,25 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     }
 
     fun searchData(query: String) {
-        tempList?.clear()
-        val db = DatabaseTasks.getInstance(context)
-        DatabaseTasks.db_write.execute {
-            val searchList = db.daoitems().search(query)
+        /* tempList?.clear()
+         val db = DatabaseTasks.getInstance(context)
+         DatabaseTasks.db_write.execute {
+             val searchList = db.daoitems().search(query)
 
-            activity?.runOnUiThread {
-                recycleSetup(searchList)
+             activity?.runOnUiThread {
+                 tasksAdpater?.addlist(searchList)
+             }
+
+
+         } */
+        val searchList: MutableList<TaskItem>
+        searchList = arrayListOf()
+        mlist.forEach {
+            if (it.title!!.contains(query)) {
+                searchList.add(it)
             }
-
-
         }
+        tasksAdpater?.addlist(searchList)
 
     }
 
@@ -266,24 +268,19 @@ class TasksFragment() : Fragment(R.layout.tasks_fragment), SearchView.OnQueryTex
     fun update(p: Int) {
         val done = mlist[p]!!.done
         val key = mlist[p]!!.id
-        val todo=mlist[p]
+        val todo = mlist[p]
         val db = DatabaseTasks.getInstance(context)
-
-
-
-
         DatabaseTasks.db_write.execute {
             if (done == 0) {
                 db.daoitems().done(key)
-                todo.done=1
+                todo.done = 1
 
             } else {
                 db.daoitems().undone(key)
-                todo.done=0
+                todo.done = 0
             }
             activity?.runOnUiThread {
                 tasksAdpater?.notifyDataSetChanged()
-                recycleSetup(mlist)
 
 
             }

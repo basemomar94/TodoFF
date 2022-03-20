@@ -14,7 +14,7 @@ import com.basem.todoff.R
 import com.basem.todoff.data.TaskItem
 
 class TasksAdpater(
-    private val mList: MutableList<TaskItem>,
+    private var mList: MutableList<TaskItem>,
     val listner: Myclicklisener,
 
 
@@ -53,12 +53,12 @@ class TasksAdpater(
         holder.important.isVisible = itemview.important == 1
         holder.important.isInvisible = itemview.important == 0
         holder.title.paint.isStrikeThruText = itemview.done == 1
-        if (itemview.done==1){
+        if (itemview.done == 1) {
             holder.title.setTextColor(Color.GRAY)
-            holder.important.alpha= 0.4F
+            holder.important.alpha = 0.4F
         } else {
             holder.title.setTextColor(Color.BLACK)
-            holder.important.alpha= 1F
+            holder.important.alpha = 1F
         }
     }
 
@@ -69,6 +69,11 @@ class TasksAdpater(
 
     interface Myclicklisener {
         fun onClick(position: Int)
+    }
+
+    fun addlist(list: MutableList<TaskItem>) {
+        mList = list
+        notifyDataSetChanged()
     }
 
 
